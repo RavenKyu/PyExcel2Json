@@ -9,7 +9,7 @@ It converts Excel to JSON.
 
 ## Install
 ```shell
-pip install pyexcel2json
+pip install pyxl2json
 ``` 
 or
 ```shell
