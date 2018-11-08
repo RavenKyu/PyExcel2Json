@@ -77,6 +77,7 @@ class ExtArgParser(ArgumentParser):
                                         'error: user input is "%s" but rule is '
                                         '"%s"' % (dest, ext_att, iav, cv))
         return self._args
+
     # ==========================================================================
     def __enter__(self):
         return self

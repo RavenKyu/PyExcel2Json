@@ -9,6 +9,7 @@
 .. note:: MIT License
 """
 
+import os
 import unittest
 import openpyxl
 from pyxl2json import parse_args
@@ -18,14 +19,17 @@ from pyxl2json.pyxl2json import \
 
 from pyxl2json import ArgsError
 
+__location__ = os.path.realpath(
+    os.path.join(os.getcwd(), os.path.dirname(__file__)))
+
 
 ################################################################################
 class TestUnit (unittest.TestCase):
     """
     Test Unit for Locate Image
     """
-    _INPUT_FILENAME_1 = 'test_excel_data_1.xlsx'
-    _INPUT_FILENAME_2 = 'test_excel_data_2.xlsx'
+    _INPUT_FILENAME_1 = __location__ + '/test_excel_data_1.xlsx'
+    _INPUT_FILENAME_2 = __location__ +'/test_excel_data_2.xlsx'
     _SHEET_NAME_1 = "Sheet1"
     _HEAD_RANGE = "A1:D1"
     _DATA_RANGE = "A2:D5"
@@ -68,7 +72,6 @@ class TestUnit (unittest.TestCase):
         args = [self._INPUT_FILENAME_1, '--head', _WRONG_COLUMN_RANGE]
         self.assertRaises(ArgsError, lambda: parse_args(args))
 
-
     # ==========================================================================
     def test_012_argument_data_range(self):
         _COLUMN_RANGE = 'A1:F1'
@@ -80,8 +83,6 @@ class TestUnit (unittest.TestCase):
 
         args = [self._INPUT_FILENAME_1, '--data', _WRONG_COLUMN_RANGE]
         self.assertRaises(ArgsError, lambda: parse_args(args))
-
-
 
     # ==========================================================================
     def test_020_open_excel_file(self):
@@ -160,8 +161,6 @@ class TestUnit (unittest.TestCase):
         data = _read_data(ws, self._DATA_RANGE)
         self.assertEqual(data, _DATA)
 
-
-
     # ==========================================================================
     def test_015_to_dict(self):
         _DATA = [{'NAME': 'Alan', 'VALUE': 12, 'COLOR': 'blue',
@@ -202,11 +201,4 @@ class TestUnit (unittest.TestCase):
                          excel_column_calculate(_COLUMN_NUMBER_3, []))
         self.assertEqual(_COLUMN_STRING_4,
                          excel_column_calculate(_COLUMN_NUMBER_4, []))
-
-
-
-
-    # def test_100_open_excel_file(self):
-    #     self.assertIsInstance()
-
 
