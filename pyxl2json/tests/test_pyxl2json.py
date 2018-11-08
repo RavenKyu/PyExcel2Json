@@ -13,7 +13,9 @@ import unittest
 import openpyxl
 from pyxl2json import parse_args
 from pyxl2json.pyxl2json import \
-    _open_excel_file, _read_sheet, _read_head, _read_data, _to_dict, _to_json
+    _open_excel_file, _read_sheet, _read_head, _read_data, _to_dict, _to_json,\
+    excel_column_calculate
+
 from pyxl2json import ArgsError
 
 
@@ -97,6 +99,15 @@ class TestUnit (unittest.TestCase):
     def test_014_read_head(self):
         _HEAD_DATA = ["NAME", "VALUE", "COLOR", "DATE"]
 
+        # Head 범위 값을 명시하지 않았을 때
+        args = ['test_excel_data.xlsx', '--sheet', self._SHEET_NAME_1]
+        argspec = parse_args(args)
+        wb = _open_excel_file(argspec.excel_filename)
+        ws = _read_sheet(wb, argspec.sheet)
+        data = _read_head(ws, None)
+        self.assertEqual(data, _HEAD_DATA)
+
+        # Head 범위 값을 명시하였을 때
         args = ['test_excel_data.xlsx', '--sheet', self._SHEET_NAME_1]
         argspec = parse_args(args)
         wb = _open_excel_file(argspec.excel_filename)
@@ -117,8 +128,16 @@ class TestUnit (unittest.TestCase):
         argspec = parse_args(args)
         wb = _open_excel_file(argspec.excel_filename)
         ws = _read_sheet(wb, argspec.sheet)
+
+        # 데이터 범위 값을 명시하지 않았을 때
+        data = _read_data(ws, None)
+        self.assertEqual(data, _DATA)
+
+        # 데이터 범위 값을 명시하였을 때
         data = _read_data(ws, self._DATA_RANGE)
         self.assertEqual(data, _DATA)
+
+
 
     # ==========================================================================
     def test_015_to_dict(self):
@@ -139,6 +158,30 @@ class TestUnit (unittest.TestCase):
         data = _read_data(ws, self._DATA_RANGE)
         d = _to_dict(head, data)
         self.assertEqual(_DATA, d)
+
+    # ==========================================================================
+    def test_020_excel_colum_calculate(self):
+        _COLUMN_NUMBER_1 = 1
+        _COLUMN_NUMBER_2 = 26
+        _COLUMN_NUMBER_3 = 27
+        _COLUMN_NUMBER_4 = 1000
+
+        _COLUMN_STRING_1 = 'A'
+        _COLUMN_STRING_2 = 'Z'
+        _COLUMN_STRING_3 = 'AA'
+        _COLUMN_STRING_4 = 'ALL'
+
+        self.assertEqual(_COLUMN_STRING_1,
+                         excel_column_calculate(_COLUMN_NUMBER_1, []))
+        self.assertEqual(_COLUMN_STRING_2,
+                         excel_column_calculate(_COLUMN_NUMBER_2, []))
+        self.assertEqual(_COLUMN_STRING_3,
+                         excel_column_calculate(_COLUMN_NUMBER_3, []))
+        self.assertEqual(_COLUMN_STRING_4,
+                         excel_column_calculate(_COLUMN_NUMBER_4, []))
+
+
+
 
     # def test_100_open_excel_file(self):
     #     self.assertIsInstance()
