@@ -1,0 +1,4 @@
+venv/*
+*.json
+.idea/*
+*.pyc
