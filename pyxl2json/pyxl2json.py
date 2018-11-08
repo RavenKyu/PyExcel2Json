@@ -9,6 +9,7 @@
 """
 import openpyxl
 import json
+import ntpath
 
 ################################################################################
 def excel_column_calculate(n:int, d:list):
@@ -62,11 +63,24 @@ def _to_json(data: list):
     return json.dumps(data, indent=4, ensure_ascii=False)
 
 ################################################################################
-def main(argspec):
-    wb = _open_excel_file(argspec.excel_filename)
-    ws = _read_sheet(wb, argspec.sheet)
-    head = _read_head(ws, argspec.head)
-    data = _read_data(ws, argspec.data)
+def _as_file(path:str, data):
+    head, tail = ntpath.split(path)
+    filename_ext = tail or ntpath.basename(head)
+    filename, ext = ntpath.splitext(filename_ext)
+    with open(filename + '.json', 'w') as f:
+        f.write(data)
 
-    d = _to_dict(head, data)
-    print(_to_json(d))
+################################################################################
+def main(argspec):
+    for filename in argspec.excel_filename:
+        wb = _open_excel_file(filename)
+        ws = _read_sheet(wb, argspec.sheet)
+        head = _read_head(ws, argspec.head)
+        data = _read_data(ws, argspec.data)
+        d = _to_dict(head, data)
+        json_data = _to_json(d)
+        if argspec.verbose:
+            print(json_data)
+        if argspec.asfile:
+            _as_file(filename, json_data)
+

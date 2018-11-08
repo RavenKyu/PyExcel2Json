@@ -24,6 +24,8 @@ class TestUnit (unittest.TestCase):
     """
     Test Unit for Locate Image
     """
+    _INPUT_FILENAME_1 = 'test_excel_data_1.xlsx'
+    _INPUT_FILENAME_2 = 'test_excel_data_2.xlsx'
     _SHEET_NAME_1 = "Sheet1"
     _HEAD_RANGE = "A1:D1"
     _DATA_RANGE = "A2:D5"
@@ -38,9 +40,16 @@ class TestUnit (unittest.TestCase):
 
     # ==========================================================================
     def test_010_argument_filename(self):
-        args = ['test_excel_data.xlsx',]
+        # 단일 파일일 경우
+        args = [self._INPUT_FILENAME_1]
         argspec = parse_args(args)
-        self.assertEqual(argspec.excel_filename, "test_excel_data.xlsx")
+        self.assertEqual(argspec.excel_filename, [self._INPUT_FILENAME_1])
+
+        # 다수 파일일 경우
+        args = [self._INPUT_FILENAME_1, self._INPUT_FILENAME_2]
+        argspec = parse_args(args)
+        self.assertEqual(argspec.excel_filename,
+                         [self._INPUT_FILENAME_1, self._INPUT_FILENAME_2])
 
     # ==========================================================================
     def test_011_argument_head(self):
@@ -48,15 +57,15 @@ class TestUnit (unittest.TestCase):
         _WRONG_COLUMN_RANGE = 'A1F1'
 
         # --head 옵션이 없을 때의 값은 None
-        args = ['test_excel_data.xlsx',]
+        args = [self._INPUT_FILENAME_1,]
         argspec = parse_args(args)
         self.assertEqual(argspec.head, None)
 
-        args = ['test_excel_data.xlsx', '--head', _COLUMN_RANGE]
+        args = [self._INPUT_FILENAME_1, '--head', _COLUMN_RANGE]
         argspec = parse_args(args)
         self.assertEqual(argspec.head, _COLUMN_RANGE)
 
-        args = ['test_excel_data.xlsx', '--head', _WRONG_COLUMN_RANGE]
+        args = [self._INPUT_FILENAME_1, '--head', _WRONG_COLUMN_RANGE]
         self.assertRaises(ArgsError, lambda: parse_args(args))
 
 
@@ -65,52 +74,66 @@ class TestUnit (unittest.TestCase):
         _COLUMN_RANGE = 'A1:F1'
         _WRONG_COLUMN_RANGE = 'A1F1'
 
-        args = ['test_excel_data.xlsx', '--data', _COLUMN_RANGE]
+        args = [self._INPUT_FILENAME_1, '--data', _COLUMN_RANGE]
         argspec = parse_args(args)
         self.assertEqual(_COLUMN_RANGE, argspec.data)
 
-        args = ['test_excel_data.xlsx', '--data', _WRONG_COLUMN_RANGE]
+        args = [self._INPUT_FILENAME_1, '--data', _WRONG_COLUMN_RANGE]
         self.assertRaises(ArgsError, lambda: parse_args(args))
+
+
 
     # ==========================================================================
     def test_020_open_excel_file(self):
-        args = ['test_excel_data.xlsx',]
+        args = [self._INPUT_FILENAME_1,]
         argspec = parse_args(args)
-        wb = _open_excel_file(argspec.excel_filename)
+        wb = _open_excel_file(argspec.excel_filename[0])
         self.assertIsInstance(wb, openpyxl.Workbook)
 
     # ==========================================================================
     def test_013_argument_sheet_name(self):
         _WRONG_SHEET_NAME = "Sheet 2"
 
-        args = ['test_excel_data.xlsx', '--sheet', self._SHEET_NAME_1]
+        args = [self._INPUT_FILENAME_1, '--sheet', self._SHEET_NAME_1]
         argspec = parse_args(args)
-        wb = _open_excel_file(argspec.excel_filename)
+        wb = _open_excel_file(argspec.excel_filename[0])
         ws = _read_sheet(wb, argspec.sheet)
         self.assertIsInstance(ws, openpyxl.worksheet.Worksheet)
 
-        args = ['test_excel_data.xlsx', '--sheet', _WRONG_SHEET_NAME]
+        args = [self._INPUT_FILENAME_1, '--sheet', _WRONG_SHEET_NAME]
         argspec = parse_args(args)
-        wb = _open_excel_file(argspec.excel_filename)
+        wb = _open_excel_file(argspec.excel_filename[0])
         self.assertRaises(
             KeyError, lambda: _read_sheet(wb, argspec.sheet))
+
+    # ==========================================================================
+    def test_014_argument_as_file(self):
+        args = [self._INPUT_FILENAME_1, '--asfile']
+        argspec = parse_args(args)
+        self.assertTrue(argspec.asfile)
+
+    # ==========================================================================
+    def test_015_argument_verbose(self):
+        args = [self._INPUT_FILENAME_1, '--verbose']
+        argspec = parse_args(args)
+        self.assertTrue(argspec.verbose)
 
     # ==========================================================================
     def test_014_read_head(self):
         _HEAD_DATA = ["NAME", "VALUE", "COLOR", "DATE"]
 
         # Head 범위 값을 명시하지 않았을 때
-        args = ['test_excel_data.xlsx', '--sheet', self._SHEET_NAME_1]
+        args = [self._INPUT_FILENAME_1, '--sheet', self._SHEET_NAME_1]
         argspec = parse_args(args)
-        wb = _open_excel_file(argspec.excel_filename)
+        wb = _open_excel_file(argspec.excel_filename[0])
         ws = _read_sheet(wb, argspec.sheet)
         data = _read_head(ws, None)
         self.assertEqual(data, _HEAD_DATA)
 
         # Head 범위 값을 명시하였을 때
-        args = ['test_excel_data.xlsx', '--sheet', self._SHEET_NAME_1]
+        args = [self._INPUT_FILENAME_1, '--sheet', self._SHEET_NAME_1]
         argspec = parse_args(args)
-        wb = _open_excel_file(argspec.excel_filename)
+        wb = _open_excel_file(argspec.excel_filename[0])
         ws = _read_sheet(wb, argspec.sheet)
         data = _read_head(ws, self._HEAD_RANGE)
         self.assertEqual(data, _HEAD_DATA)
@@ -124,9 +147,9 @@ class TestUnit (unittest.TestCase):
             ['John', 45, 'orange', 'Sep. 29, 2009'],
             ['Minna', 27, 'teal', 'Sep. 30, 2009'],]
 
-        args = ['test_excel_data.xlsx', '--sheet', self._SHEET_NAME_1]
+        args = [self._INPUT_FILENAME_1, '--sheet', self._SHEET_NAME_1]
         argspec = parse_args(args)
-        wb = _open_excel_file(argspec.excel_filename)
+        wb = _open_excel_file(argspec.excel_filename[0])
         ws = _read_sheet(wb, argspec.sheet)
 
         # 데이터 범위 값을 명시하지 않았을 때
@@ -150,9 +173,9 @@ class TestUnit (unittest.TestCase):
          {'NAME': 'Minna', 'VALUE': 27, 'COLOR': 'teal',
           'DATE': 'Sep. 30, 2009'}]
 
-        args = ['test_excel_data.xlsx', '--sheet', self._SHEET_NAME_1]
+        args = [self._INPUT_FILENAME_1, '--sheet', self._SHEET_NAME_1]
         argspec = parse_args(args)
-        wb = _open_excel_file(argspec.excel_filename)
+        wb = _open_excel_file(argspec.excel_filename[0])
         ws = _read_sheet(wb, argspec.sheet)
         head = _read_head(ws, self._HEAD_RANGE)
         data = _read_data(ws, self._DATA_RANGE)
