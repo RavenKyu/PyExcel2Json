@@ -28,10 +28,10 @@ def re_match(s, p):
 class ExtArgParser(ArgumentParser):
     EXTENDED_ATTRS = {'re_match': re_match}
 
+    # ==========================================================================
     def __init__(self, *args, **kwargs):
         self._ext_argspec = {}
         super(ExtArgParser, self).__init__(*args, **kwargs)
-
 
     # ==========================================================================
     def add_argument(self, *args, **kwargs):
@@ -91,13 +91,17 @@ def parse_args(*argv):
     parser = ExtArgParser(
             prog=sys.argv[0],
             description='PyExcel2Json is easy to convert Excel to Json')
-    parser.add_argument('excel_filename', help='')
+    parser.add_argument('excel_filename', type=str, nargs='+', help='')
     parser.add_argument('--head', '-t',
                         re_match='^\w+\d+:\w+\d+$', help='A1:F1')
     parser.add_argument('--data', '-d',
                         re_match='^\w+\d+:\w+\d+$', help='A2:F10')
-    parser.add_argument('--sheet', '-s', default='Sheet1',
+    parser.add_argument('--sheet', default='Sheet1',
                         type=str, help='SHEET NAME', )
+    parser.add_argument('--verbose', '-v', action='store_true',
+                        help='save as file(s)')
+    parser.add_argument('--asfile', action='store_true',
+                        help='save as file(s)')
     r = parser.parse_args(*argv)
     return r
 
