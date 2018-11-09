@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/RavenKyu/PyExcel2Json.svg?branch=master)](https://travis-ci.org/RavenKyu/PyExcel2Json)
+[![Documentation Status](https://readthedocs.org/projects/pyxl2json/badge/?version=latest)](https://pyxl2json.readthedocs.io/en/latest/?badge=latest)
 
 # PyExcel2Json
 It converts Excel to JSON.
