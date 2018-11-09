@@ -13,6 +13,18 @@ import ntpath
 
 ################################################################################
 def excel_column_calculate(n:int, d:list):
+    """
+    Excel의 `A`, `AA` 와 같은 값을 Column 값을 쉽게 구할 수 있습니다.
+    :param n: 첫 번째 Column 기준으로 1 이상의 수
+    :param d: 빈 list
+    :return: str
+    >>> excel_column_calculate(1, []))
+    'A'
+    >>> excel_column_calculate(27, [])
+    'AA'
+    >>> excel_column_calculate(1000, [])
+    'ALL'
+    """
     if not n:
         return ''.join(d)
     n -= 1
@@ -23,10 +35,22 @@ def excel_column_calculate(n:int, d:list):
 
 ################################################################################
 def _open_excel_file(filename) -> openpyxl.Workbook:
+    """
+    파라메터 filename의 위치에 있는 엑셀파일을 열어서
+    openpyxl.Workbook 객체를 반환
+    :param filename: .xlsx 형태의 엑셀파일
+    :return: <openpyxl.Workbook>
+    """
     return openpyxl.load_workbook(filename)
 
 ################################################################################
 def _read_sheet(wb:openpyxl.Workbook, sheet:str):
+    """
+    파라메터 sheet를 Workbook에서 찾아서 반환
+    :param wb: <openpyxl.Workbook>
+    :param sheet: WorkSheet 이름
+    :return: <openpyxl.Worksheet>
+    """
     return wb[sheet]
 
 ################################################################################
