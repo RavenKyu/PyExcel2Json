@@ -27,7 +27,7 @@ setup(
     url='',
     download_url='',
     install_requires=reqs,
-    packages=find_packages(include=['locateimage*', 'tests', ]),
+    packages=find_packages(include=['pyxl2json*', 'tests', ]),
     keywords=['excel', 'json', 'converter'],
     python_requires='>=3',
     package_data={},
